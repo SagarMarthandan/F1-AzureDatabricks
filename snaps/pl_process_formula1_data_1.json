@@ -1,0 +1,22 @@
+{
+    "name": "Execute Ingestion",
+    "type": "ExecutePipeline",
+    "dependsOn": [],
+    "policy": {
+        "secureInput": false
+    },
+    "userProperties": [],
+    "typeProperties": {
+        "pipeline": {
+            "referenceName": "pl_ingest_formula1_data",
+            "type": "PipelineReference"
+        },
+        "waitOnCompletion": true,
+        "parameters": {
+            "p_window_end_date": {
+                "value": "@pipeline().parameters.p_window_end_date",
+                "type": "Expression"
+            }
+        }
+    }
+}

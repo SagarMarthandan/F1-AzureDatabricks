@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
+  <style>
+    .box { fill:#f8f9fb; stroke:#333; stroke-width:1.5px; }
+    .title { font: bold 14px sans-serif; fill:#111 }
+    .field { font: 12px monospace; fill:#222 }
+    .rel { stroke:#555; stroke-width:1.8px; fill:none; }
+    .arrow { marker-end: url(#arrow); }
+    .label { font: 11px sans-serif; fill:#333 }
+  </style>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0 L10 5 L0 10 z" fill="#555" />
+    </marker>
+  </defs>
+
+  <!-- Boxes -->
+  <!-- Drivers -->
+  <rect x="60" y="160" width="240" height="120" class="box" rx="6" />
+  <text x="72" y="180" class="title">drivers</text>
+  <text x="72" y="200" class="field">driverId (PK)</text>
+  <text x="72" y="216" class="field">driverRef</text>
+  <text x="72" y="232" class="field">forename / surname</text>
+
+  <!-- Constructors -->
+  <rect x="900" y="160" width="240" height="120" class="box" rx="6" />
+  <text x="912" y="180" class="title">constructors</text>
+  <text x="912" y="200" class="field">constructorId (PK)</text>
+  <text x="912" y="216" class="field">constructorRef</text>
+  <text x="912" y="232" class="field">name / nationality</text>
+
+  <!-- Circuits -->
+  <rect x="60" y="20" width="240" height="80" class="box" rx="6" />
+  <text x="72" y="40" class="title">circuits</text>
+  <text x="72" y="60" class="field">circuitId (PK)</text>
+  <text x="72" y="76" class="field">name / location / country</text>
+
+  <!-- Seasons -->
+  <rect x="900" y="20" width="240" height="80" class="box" rx="6" />
+  <text x="912" y="40" class="title">seasons</text>
+  <text x="912" y="60" class="field">year (PK)</text>
+
+  <!-- Races -->
+  <rect x="360" y="120" width="300" height="120" class="box" rx="6" />
+  <text x="372" y="140" class="title">races</text>
+  <text x="372" y="160" class="field">raceId (PK)</text>
+  <text x="372" y="176" class="field">year → seasons(year)</text>
+  <text x="372" y="192" class="field">circuitId → circuits(circuitId)</text>
+
+  <!-- Results -->
+  <rect x="360" y="280" width="300" height="140" class="box" rx="6" />
+  <text x="372" y="300" class="title">results</text>
+  <text x="372" y="320" class="field">resultId (PK)</text>
+  <text x="372" y="336" class="field">raceId → races(raceId)</text>
+  <text x="372" y="352" class="field">driverId → drivers(driverId)</text>
+  <text x="372" y="368" class="field">constructorId → constructors(constructorId)</text>
+  <text x="372" y="384" class="field">statusId → status(statusId)</text>
+
+  <!-- Lap Times -->
+  <rect x="60" y="320" width="240" height="100" class="box" rx="6" />
+  <text x="72" y="340" class="title">lap_times</text>
+  <text x="72" y="360" class="field">raceId (PK) → races</text>
+  <text x="72" y="376" class="field">driverId (PK) → drivers</text>
+  <text x="72" y="392" class="field">lap / milliseconds / time</text>
+
+  <!-- Pit Stops -->
+  <rect x="60" y="440" width="240" height="100" class="box" rx="6" />
+  <text x="72" y="460" class="title">pit_stops</text>
+  <text x="72" y="480" class="field">raceId (PK) → races</text>
+  <text x="72" y="496" class="field">driverId (PK) → drivers</text>
+  <text x="72" y="512" class="field">stop / lap / duration</text>
+
+  <!-- Qualifying -->
+  <rect x="900" y="320" width="240" height="120" class="box" rx="6" />
+  <text x="912" y="340" class="title">qualifying</text>
+  <text x="912" y="360" class="field">qualifyId (PK)</text>
+  <text x="912" y="376" class="field">raceId → races(raceId)</text>
+  <text x="912" y="392" class="field">driverId → drivers(driverId)</text>
+
+  <!-- Constructor Results -->
+  <rect x="900" y="460" width="240" height="100" class="box" rx="6" />
+  <text x="912" y="480" class="title">constructor_results</text>
+  <text x="912" y="500" class="field">constructorResultsId (PK)</text>
+  <text x="912" y="516" class="field">raceId → races(raceId)</text>
+  <text x="912" y="532" class="field">constructorId → constructors(constructorId)</text>
+
+  <!-- Constructor Standings -->
+  <rect x="900" y="600" width="240" height="120" class="box" rx="6" />
+  <text x="912" y="620" class="title">constructor_standings</text>
+  <text x="912" y="640" class="field">constructorStandingsId (PK)</text>
+  <text x="912" y="656" class="field">raceId → races(raceId)</text>
+  <text x="912" y="672" class="field">constructorId → constructors(constructorId)</text>
+
+  <!-- Driver Standings -->
+  <rect x="60" y="600" width="240" height="120" class="box" rx="6" />
+  <text x="72" y="620" class="title">driver_standings</text>
+  <text x="72" y="640" class="field">driverStandingsId (PK)</text>
+  <text x="72" y="656" class="field">raceId → races(raceId)</text>
+  <text x="72" y="672" class="field">driverId → drivers(driverId)</text>
+
+  <!-- Status -->
+  <rect x="360" y="460" width="300" height="80" class="box" rx="6" />
+  <text x="372" y="480" class="title">status</text>
+  <text x="372" y="500" class="field">statusId (PK)</text>
+  <text x="372" y="516" class="field">status (text)</text>
+
+  <!-- Relationships (lines) -->
+  <!-- drivers -> results -->
+  <path d="M300 220 L360 320" class="rel arrow" />
+  <text x="320" y="260" class="label">driverId</text>
+
+  <!-- constructors -> results -->
+  <path d="M900 220 L660 320" class="rel arrow" />
+  <text x="780" y="260" class="label">constructorId</text>
+
+  <!-- races -> results -->
+  <path d="M540 240 L540 280" class="rel arrow" />
+  <text x="520" y="260" class="label">raceId</text>
+
+  <!-- races -> lap_times -->
+  <path d="M420 240 L300 360" class="rel arrow" />
+  <text x="360" y="300" class="label">raceId</text>
+
+  <!-- drivers -> lap_times -->
+  <path d="M240 220 L240 360" class="rel arrow" />
+  <text x="200" y="300" class="label">driverId</text>
+
+  <!-- races -> pit_stops -->
+  <path d="M420 240 L300 480" class="rel arrow" />
+  <text x="360" y="360" class="label">raceId</text>
+
+  <!-- drivers -> pit_stops -->
+  <path d="M240 220 L240 480" class="rel arrow" />
+  <text x="200" y="420" class="label">driverId</text>
+
+  <!-- races -> qualifying -->
+  <path d="M660 240 L900 360" class="rel arrow" />
+  <text x="780" y="300" class="label">raceId</text>
+
+  <!-- drivers -> qualifying -->
+  <path d="M300 220 L900 380" class="rel arrow" />
+  <text x="640" y="300" class="label">driverId</text>
+
+  <!-- races -> constructor_results -->
+  <path d="M660 240 L900 480" class="rel arrow" />
+  <text x="780" y="340" class="label">raceId</text>
+
+  <!-- constructors -> constructor_results -->
+  <path d="M1040 220 L900 460" class="rel arrow" />
+  <text x="980" y="340" class="label">constructorId</text>
+
+  <!-- races -> constructor_standings -->
+  <path d="M660 240 L900 640" class="rel arrow" />
+  <text x="780" y="420" class="label">raceId</text>
+
+  <!-- constructors -> constructor_standings -->
+  <path d="M1040 220 L900 640" class="rel arrow" />
+  <text x="980" y="520" class="label">constructorId</text>
+
+  <!-- races -> driver_standings -->
+  <path d="M540 240 L180 640" class="rel arrow" />
+  <text x="320" y="420" class="label">raceId</text>
+
+  <!-- drivers -> driver_standings -->
+  <path d="M300 220 L300 640" class="rel arrow" />
+  <text x="260" y="520" class="label">driverId</text>
+
+  <!-- races -> circuits -->
+  <path d="M300 160 L180 100" class="rel arrow" />
+  <text x="220" y="140" class="label">circuitId</text>
+
+  <!-- seasons -> races -->
+  <path d="M1040 60 L700 140" class="rel arrow" />
+  <text x="860" y="100" class="label">year</text>
+
+  <!-- status -> results -->
+  <path d="M510 520 L540 400" class="rel arrow" />
+  <text x="480" y="460" class="label">statusId</text>
+
+  <!-- Footer -->
+  <text x="20" y="880" class="label">Generated ER diagram from formula1_ergast_data_user_guide.txt — shows primary keys and FK links used in transformations</text>
+</svg>
