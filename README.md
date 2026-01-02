@@ -227,6 +227,22 @@ Local notes:
 - ADF pipeline JSON and snapshots: [snaps/](snaps)
 - Data schema guide: [formula1_ergast_data_user_guide.txt](formula1_ergast_data_user_guide.txt)
 
+Databricks is the core of this project, where all data manipulation occurs. The work is logically separated into the following notebook directories:
+
+- 📂 **`notebook/setup`**: This directory contains notebooks dedicated to establishing a secure connection between Azure Databricks and Azure Data Lake Storage. It explores various authentication methods (access keys, SAS tokens) and ultimately implements a robust solution using a Service Principal to mount the ADLS containers to DBFS. This is the crucial first step for the project.
+
+- 📂 **`notebook/ingestion`**: These notebooks handle the ELT process from the Bronze to the Silver layer. Each notebook is responsible for a specific raw file (e.g., `1. ingest_circuits_file.ipynb`). They read the source data, apply the correct schema, perform necessary cleaning and data type conversions, and write the output as a partitioned Delta table to the `processed` container.
+
+- 📂 **`notebook/transformation`**: Here, the Silver data is elevated to Gold. These notebooks perform the heavy lifting of joining multiple Silver tables to create denormalized, aggregated datasets ready for business intelligence. For example, `1. race_results.ipynb` joins races, drivers, and results data, while `2. driver_standings.ipynb` calculates championship points using window functions.
+
+- 📂 **`notebook/analysis`**: This is the final step, where the clean, aggregated Gold-layer data is queried to produce insights. Notebooks like `0. dominant_drivers.ipynb` demonstrate how easily an analyst can now query the presentation tables to answer complex questions.
+
+- 📂 **`notebook/includes`**: A centralized location for reusable code. `common_functions.ipynb` contains helper functions (e.g., adding an ingestion date column) that are called from multiple ingestion notebooks, promoting code reuse and consistency.
+
+- 📂 **`notebook/demo`**: A collection of experimental and learning notebooks. These were used to explore various Spark functionalities like joins, aggregations, and temporary views before implementing them in the main pipeline.
+
+Initially, the project used the standard Databricks Hive metastore, but it was later migrated to use **Delta Lake** tables directly. This switch provides critical **ACID transaction** capabilities, ensuring data reliability and consistency, especially in incremental loading scenarios.
+
 ---
 
 ## 📈 Example transformation roadmap (actionable)
