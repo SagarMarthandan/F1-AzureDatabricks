@@ -64,60 +64,26 @@ Key notes:
 
 ## 🔁 Medallion Architecture (Detailed)
 
-The entire pipeline is structured around the Medallion Architecture, which logically organizes data into three distinct layers: Bronze, Silver, and Gold. This ensures data quality, traceability, and reusability.
+The project uses the Medallion pattern to move data from raw to business-ready tables. Map between repo directories and medallion layers:
+
+- Bronze (raw): `raw/` — raw CSV/JSON files exactly as extracted.
+- Silver (conformed): `notebook/ingestion/` produces partitioned Delta tables after schema enforcement and cleaning.
+- Gold (presentation): `notebook/transformation/` produces aggregated/denormalized presentation tables used by analysis notebooks in `notebook/analysis/`.
+
+Mermaid view:
 
 ```mermaid
-graph TD
-    subgraph "Azure"
-        A[External Source: Ergast F1 Data <br> (CSVs, JSONs)] --> B{Azure Data Factory Pipeline};
-        B --> C[Azure Data Lake Gen2];
+flowchart TB
+    subgraph Bronze
+        raw_files[raw/ files]
     end
-
-    subgraph "Databricks Processing"
-        subgraph "Bronze Layer (Raw Data)"
-            C -- "1. Load Raw Files from `raw` dir" --> D[<br><b>circuits.csv, drivers.json, etc.</b><br><i>Stored in ADLS `raw` container</i>];
-        end
-
-        subgraph "Silver Layer (Cleansed & Conformed Data)"
-             D -- "2. `ingestion` notebooks <br> (Apply Schema, Clean, Partition)" --> E[<b>Processed Delta Tables</b><br><i>e.g., circuits, races, drivers</i><br>Stored in ADLS `processed` container];
-        end
-
-        subgraph "Gold Layer (Business Aggregates)"
-            E -- "3. `transformation` notebooks <br> (Joins, Aggregations, Business Logic)" --> F[<b>Presentation Delta Tables</b><br><i>e.g., race_results, driver_standings</i><br>Stored in ADLS `presentation` container];
-        end
+    subgraph Silver
+        silver_deltas[notebook/ingestion -> Delta tables]
     end
-
-    subgraph "Analysis & Consumption"
-        F -- "4. `analysis` notebooks" --> G[Analysis Notebooks<br><i>(e.g., dominant_drivers)</i>];
+    subgraph Gold
+        gold_tables[notebook/transformation -> presentation tables]
     end
-
-    style C fill:#D3D3D3,stroke:#333,stroke-width:2px
-    style D fill:#CD7F32,stroke:#333,stroke-width:2px
-    style E fill:#C0C0C0,stroke:#333,stroke-width:2px
-    style F fill:#FFD700,stroke:#333,stroke-width:2px
-```
-
-### High-Level Service Interaction
-
-The following diagram illustrates the roles of the key Azure services and how they interact:
-
-```mermaid
-graph TD
-    subgraph "Azure Services Interaction"
-        A[Azure Data Factory] -- "1. Triggers Notebook Pipeline" --> B(Azure Databricks);
-        B -- "2. Reads/Writes Data" --> C(Azure Data Lake Storage);
-        C -- "Viewable with" --> D(Azure Storage Explorer);
-    end
-
-    subgraph "Data Flow within Databricks"
-        C -- "Reads Bronze Layer (Raw)" --> B;
-        B -- "Writes Silver/Gold Layers (Processed)" --> C;
-    end
-
-    style A fill:#4285F4,stroke:#333,stroke-width:2px
-    style B fill:#FF9900,stroke:#333,stroke-width:2px
-    style C fill:#00BCF2,stroke:#333,stroke-width:2px
-    style D fill:#0078D4,stroke:#333,stroke-width:2px
+    raw_files --> silver_deltas --> gold_tables
 ```
 
 Where each step does:
