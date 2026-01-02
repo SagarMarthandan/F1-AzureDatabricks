@@ -42,48 +42,62 @@ This repository implements a modern ELT pattern: source files are loaded into th
 
 ## 🏛️ Architecture & Workflow (Overview)
 
-High-level components and flow:
+### Medallion Architecture Workflow
+
+The entire pipeline is structured around the Medallion Architecture, which logically organizes data into three distinct layers: Bronze, Silver, and Gold. This ensures data quality, traceability, and reusability.
 
 ```mermaid
-graph LR
-    A[External Source: Ergast F1 Data (CSV/JSON)] --> B[Azure Data Explorer / Ingest Scripts]
-    B --> C[Azure Data Lake Storage (raw container) — Bronze]
-    C --> D[Azure Data Factory pipeline]
-    D --> E[Databricks Notebooks (ingestion & transformation)]
-    E --> F[Processed Delta Tables (Silver/Gold) stored in ADLS]
-    F --> G[Analysis Notebooks / BI / Reports]
+graph TD
+    subgraph "Azure"
+        A["External Source: Ergast F1 Data (CSVs, JSONs)"] --> B{"Azure Data Factory Pipeline"}
+        B --> C["Azure Data Lake Gen2"]
+    end
+
+    subgraph "Databricks Processing"
+        subgraph "Bronze Layer (Raw Data)"
+             C -- "1. Load Raw Files from raw dir" --> D["circuits.csv, drivers.json, etc."]
+        end
+
+        subgraph "Silver Layer (Cleansed & Conformed Data)"
+             D -- "2. ingestion notebooks (Apply Schema, Clean, Partition)" --> E["Processed Delta Tables"]
+        end
+
+        subgraph "Gold Layer (Business Aggregates)"
+            E -- "3. transformation notebooks (Joins, Aggregations, Business Logic)" --> F["Presentation Delta Tables"]
+        end
+    end
+
+    subgraph "Analysis & Consumption"
+        F -- "4. analysis notebooks" --> G["Analysis Notebooks"]
+    end
+
+    style C fill:#D3D3D3,stroke:#333,stroke-width:2px
+    style D fill:#CD7F32,stroke:#333,stroke-width:2px
+    style E fill:#C0C0C0,stroke:#333,stroke-width:2px
+    style F fill:#FFD700,stroke:#333,stroke-width:2px
 ```
 
-Key notes:
+### High-Level Service Interaction
 
-- Raw files land in `raw/` (see `raw/` folder). Use the `formula1_ergast_data_user_guide.txt` to understand entity schema and relationships.
-- ADF triggers Databricks notebooks (ingestion → validation → transformation).
-- Databricks writes Delta tables for ACID and incremental load support.
-
----
-
-## 🔁 Medallion Architecture (Detailed)
-
-The project uses the Medallion pattern to move data from raw to business-ready tables. Map between repo directories and medallion layers:
-
-- Bronze (raw): `raw/` — raw CSV/JSON files exactly as extracted.
-- Silver (conformed): `notebook/ingestion/` produces partitioned Delta tables after schema enforcement and cleaning.
-- Gold (presentation): `notebook/transformation/` produces aggregated/denormalized presentation tables used by analysis notebooks in `notebook/analysis/`.
-
-Mermaid view:
+The following diagram illustrates the roles of the key Azure services and how they interact:
 
 ```mermaid
-flowchart TB
-    subgraph Bronze
-        raw_files[raw/ files]
+graph TD
+    subgraph "Azure Services Interaction"
+        A["Azure Data Factory"] -- "1. Triggers Notebook Pipeline" --> B["Azure Databricks"]
+        B -- "2. Reads/Writes Data" --> C["Azure Data Lake Storage"]
+        C -- "Viewable with" --> D["Azure Storage Explorer"]
     end
-    subgraph Silver
-        silver_deltas[notebook/ingestion -> Delta tables]
+
+    subgraph "Data Flow within Databricks"
+        C -- "Reads Bronze Layer (Raw)" --> B
+        B -- "Writes Silver/Gold Layers (Processed)" --> C
     end
-    subgraph Gold
-        gold_tables[notebook/transformation -> presentation tables]
-    end
-    raw_files --> silver_deltas --> gold_tables
+
+    style A fill:#4285F4,stroke:#333,stroke-width:2px
+    style B fill:#FF9900,stroke:#333,stroke-width:2px
+    style C fill:#00BCF2,stroke:#333,stroke-width:2px
+    style D fill:#0078D4,stroke:#333,stroke-width:2px
 ```
 
 Where each step does:
